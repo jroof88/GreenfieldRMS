@@ -1,0 +1,9 @@
+#Ignore connect.php -- login credentials
+/webpages/php/connect.php
+
+#Ignore sql logs
+*.log
+
+#ignore images
+*.jpg
+*.png
