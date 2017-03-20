@@ -3,9 +3,10 @@
 	include_once "connect.php"; 
 
 	echo "<h3> All available properties </h2>";
-    	$sql = "SELECT rentalNo, address_street, address_city, address_zip, noOfRooms, monthlyRent  FROM Rental_Property WHERE status = 'Available'";
-
-    	$sql_statement = OCIParse($conn, $sql);
+    	
+	$sql = "SELECT rentalNo, address_street, address_city, address_zip, noOfRooms, monthlyRent  FROM Rental_Property WHERE status = 'Available'";
+	
+	$sql_statement = OCIParse($conn, $sql);
     	OCIExecute($sql_statement);
     	$num_columns = OCINumCols($sql_statement);
 
@@ -20,11 +21,14 @@
       		}
       		echo "</TR>";
     	}
-    echo "</TABLE>";
+    	
+	echo "</TABLE>";
 
 	echo "</table>";
 	echo "<h2> 8) Show the renters who have rented more than 1 property </h2>";
+	
 	$sql1 = "SELECT renterId, first_name, last_name FROM Renter WHERE renterId IN (SELECT renterId FROM Lease_Agreement GROUP BY renterId HAVING COUNT(*)>1)";
+	
 	$sql_statement1 = OCIParse($conn, $sql1);
 	OCIExecute($sql_statement1);
 	$num_columns = OCINUmCols($sql_statement1);
@@ -39,6 +43,7 @@
 		}
 		echo "</tr>";
 	}
+	
 	echo "</table>";
 
 	echo "<h2> 9) Show the average rent for properties in a town (name of town in entered as input) </h2>";
@@ -48,19 +53,19 @@
 	echo "</form>";
 
 
-	echo "<h2> 10)  Show the names and address of proerties whose leases will expire in the next two months</h2>
+	echo "<h2> 10)  Show the names and address of properties whose leases will expire in the next two months</h2>
 </body>";
-	$sql2 = "SELECT Lease_Agreement.leaseID, Lease_Agreement.renterFirst_name, Lease_Agreement.renterLast_name,Rental_Property.rentalNo,Rental_Property.address_street,Rental_Property.address_city,rental_property.address_zip
+	$sql2 = "SELECT Lease_Agreement.leaseId, Lease_Agreement.renterId, Renter.first_name, Renter.last_name, Rental_Property.rentalNo, Rental_Property.address_street, Rental_Property.address_city, Rental_Property.address_zip, Lease_Agreement.end_date
 FROM Lease_Agreement
-INNER JOIN Rental_Property
-ON Lease_Agreement.rentalNo = Rental_Property.rentalNo AND (Lease_Agreement.end_date-SYSDATE) <= 60";
+INNER JOIN renter ON Lease_Agreement.renterId = Renter.renterID AND Lease_Agreement.leaseId IN (SELECT leaseId FROM Lease_Agreement WHERE end_date-SYSDATE <= 60)
+INNER JOIN Rental_Property ON Lease_agreement.rentalNo = Rental_Property.rentalNo AND Lease_Agreement.leaseId IN (SELECT leaseId FROM lease_agreement WHERE end_date-SYSDATE <= 60) ORDER BY Lease_Agreement.end_date";
 
         $sql_statement2 = OCIParse($conn, $sql2);
         OCIExecute($sql_statement2);
         $num_columns = OCINumCols($sql_statement2);
 
         echo "<TABLE BORDER=1 class='table'>";
-        echo "<TR><TH>Lease Id </TH><TH> First Name </TH><TH> Last Name </TH><TH> Rental Number </TH><TH> Street </th><th> City </th><th> Zip </th></tr>";
+        echo "<TR><TH>Lease Id </TH><th> Renter Id </th><TH> First Name </TH><TH> Last Name </TH><TH> Rental Number </TH><TH> Street </th><th> City </th><th> Zip </th><th> End Date</th></tr>";
 
         while (OCIFetch($sql_statement2)) {
                 echo "<TR>";
@@ -70,7 +75,8 @@ ON Lease_Agreement.rentalNo = Rental_Property.rentalNo AND (Lease_Agreement.end_
                 }
                 echo "</TR>";
         }
-    echo "</TABLE>";
+    	
+	echo "</TABLE>";
 	
 	readfile("footer.html");
 ?>

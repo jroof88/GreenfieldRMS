@@ -2,10 +2,9 @@
 	readfile("header.html");
 	include_once "connect.php";	
 
-
 	$renterId = $_GET["renterId"];
 
-	 $sql_ = "SELECT first_name, last_name, contactFirst_name, contactLast_name, homePhoneNo, workPhoneNo FROM Renter WHERE renterId = '$renterId'";
+	$sql_ = "SELECT first_name, last_name, contactFirst_name, contactLast_name, homePhoneNo, workPhoneNo FROM Renter WHERE renterId = '$renterId'";
         $sql_statement_ = OCIParse($conn, $sql_);
         $y = 0;
         $renterFirst_name = NULL;
@@ -23,14 +22,15 @@
 	
 	echo "<h2> $renterFirst_name $renterLast_name's (id: $renterId) leases: </h2><br >";
 	
-	$sql = "SELECT renterId, leaseId, rentalNo, start_date, end_date, deposit, rentAmt FROM Lease_Agreement WHERE renterId = '$renterId'";
+	$sql = "SELECT Lease_Agreement.renterId, Lease_Agreement.leaseId, Lease_Agreement.rentalNo, Lease_Agreement.start_date, Lease_Agreement.end_date, Lease_Agreement.deposit, Lease_Agreement.rentAmt, Employee.first_name, Employee.last_name FROM Lease_Agreement, Employee WHERE renterId = '$renterId' AND Employee.empId IN (SELECT empId FROM Rental_Property WHERE rentalNo = Lease_Agreement.rentalNo)";
+
 	
 	$sql_statement = OCIParse($conn, $sql);
 	OCiExecute($sql_statement);
 	$numcols = OCINumCols($sql_statement);
 
 	echo "<table border=1 class='table'>";
-	echo "<tr><th> Renter Id  </th> <th> Lease Id </th> <th> Rental No </th><th> Start Date </th> <th> End Date </th> <th> Deposit </th><th> Monthly Rent </th></tr>";
+	echo "<tr><th> Renter Id  </th> <th> Lease Id </th> <th> Rental No </th><th> Start Date </th> <th> End Date </th> <th> Deposit </th><th> Monthly Rent </th> <th> Sup First </th> <th> Sup Last </th></tr>";
 	
 	$x = 0;
 	while(OCIFetch($sql_statement)){

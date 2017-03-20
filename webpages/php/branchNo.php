@@ -33,6 +33,7 @@
 		}
 		echo "</tr>";
 	}
+	
 	echo "</table>";
 	if($x == 0){
 		echo "<h2> There are currenlty no properties at $branchNo </h2>";

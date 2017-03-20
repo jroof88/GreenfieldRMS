@@ -1,6 +1,6 @@
-
-	<?php
-		readfile("header.html");
+<?php
+	
+	readfile("header.html");
 	include_once "connect.php";
 
         echo "<h2> 6) Create Lease Agreement </h2>";
